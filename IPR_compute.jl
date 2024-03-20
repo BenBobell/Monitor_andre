@@ -67,7 +67,7 @@ function monitoring_evolution_IPR(L, gamma, dt, tmax, t_start, time_exponent)
 
 end
 
-function run_iterations(L, gamma, W, t, dt, tmax, t_start, iterations)
+function run_iterations(L, W, gamma, t, dt, tmax, t_start, iterations)
     #Returns IPR for long times.
     IPR =0 
     for iteration in 1:iterations
@@ -97,7 +97,7 @@ t_start = tmax-50
 iterations = 5 
 #If parallelizing, idx will provide indexing for each set of trajectories
 @time begin
-IPR_vals = @. run_iterations(L, gamma_vals', W_vals, t_vals, dt,tmax, t_start, iterations)
+IPR_vals = @. run_iterations(L, W_vals', gamma_vals, t_vals, dt,tmax, t_start, iterations)
 end
 JLD.save("IPR_data.jld", "IPR", IPR_vals)
 
