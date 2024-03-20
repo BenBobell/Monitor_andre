@@ -69,7 +69,6 @@ end
 
 function run_iterations(L, gamma, W, t, dt, tmax, t_start, iterations)
     #Returns IPR for long times.
-    #Note that sum over trajectories isn't averaged yet
     IPR =0 
     for iteration in 1:iterations
         # Declare Hamiltonian
@@ -84,7 +83,7 @@ function run_iterations(L, gamma, W, t, dt, tmax, t_start, iterations)
         time_exponent = matrix_exponent_imaginary(H,dt)
         IPR += monitoring_evolution_IPR(L, gamma, dt, tmax, t_start, time_exponent)
         end
-    return IPR
+    return IPR/iterations
 end
 
 
