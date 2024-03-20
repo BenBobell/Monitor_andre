@@ -106,6 +106,6 @@ iterations = 5
 #If parallelizing, idx will provide indexing for each set of trajectories
 idx = 0
 
-Corr_r_arr = run_iterations(L, gamma, W, t, dt, tmax, t_length, iterations)
-JLD.save("Ct_data_$(gamma)_$(W)_$(idx).jld", "Corr_r", Corr_r_arr)
+Corr_t_arr = run_iterations(L, gamma, W, t, dt, tmax, t_length, iterations)
+JLD.save("Ct_data_$(gamma)_$(W)_$(idx).jld", "Corr_t", Corr_t_arr)
 

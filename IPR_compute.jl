@@ -99,5 +99,5 @@ iterations = 5
 @time begin
 IPR_vals = @. run_iterations(L, gamma_vals', W_vals, t_vals, dt,tmax, t_start, iterations)
 end
-JLD.save("IPR_data.jld", "Corr_r", Corr_r_arr)
+JLD.save("IPR_data.jld", "IPR", IPR_vals)
 
