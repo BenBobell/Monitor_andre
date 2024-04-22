@@ -48,38 +48,37 @@ function monitoring_evolution_IPR(L, gamma, dt, tmax, t_start, time_exponent)
         # D is the correlation matrix
         D = U*U'
         if t >= t_start
-            IPR_avg += sum(abs.(LinearAlgebra.diag(D)) .^ 2)
+            U_4 = (abs.(U)) .^ 4
+            IPR_avg += sum(U_4)
         end
         # Gives array of <n_i>
         n_expected = LinearAlgebra.diag(D)
         # Provides measurement matrix
         M_diag = etas + (gamma*dt) * (2 * n_expected .- 1)
-        M = LinearAlgebra.Diagonal(M_diag)
-        # Time evolution for U(t+dt)
-        U_dt = matrix_exponent_real(M) * time_exponent * U
-        # QR decomposition that normalizes U_dt
-        Q, = LinearAlgebra.qr(U_dt)
+        # Time evolution for U(t+dt) and QR decomposition 
+        Q, = LinearAlgebra.qr(exp.(M_diag) .* time_exponent * U)
+        # Return thin QR decomposition
         U = Matrix(Q)
     
     end
     
-    return 2*IPR_avg/(L*(tmax-t_start))
+    return 2*IPR_avg/(L*(tmax-t_start+1))
 
 end
 
-function run_iterations(L, W, gamma, t, dt, tmax, t_start, iterations)
+function run_iterations(L, W, gamma, g, dt, tmax, t_start, iterations)
     #Returns IPR for long times.
     IPR =0 
     for iteration in 1:iterations
         # Declare Hamiltonian
-        # H = t*\sum c_{i+1}^{\dagger}c_i +h.c + h_i n_i
+        # H = g*\sum c_{i+1}^{\dagger}c_i +h.c + h_i n_i
         w = -W .+ (2*W) .* rand(L)
         H = zeros(L, L)
-        H[LinearAlgebra.diagind(H,1)] .= t
-        H[LinearAlgebra.diagind(H,-1)] .= t
+        H[LinearAlgebra.diagind(H,1)] .= g
+        H[LinearAlgebra.diagind(H,-1)] .= g
         H[LinearAlgebra.diagind(H)] .= w
-        H[1,L] = t
-        H[L,1] = t
+        H[1,L] = g
+        H[L,1] = g
         time_exponent = matrix_exponent_imaginary(H,dt)
         IPR += monitoring_evolution_IPR(L, gamma, dt, tmax, t_start, time_exponent)
         end
@@ -90,14 +89,14 @@ end
 L = 256
 W_vals = .5:.1:4
 gamma_vals = .01:.01:.1
-t_vals = 1
+g_vals = 1
 dt = .05 
 tmax = trunc(Int, 2000/dt)
 t_start = tmax-50
 iterations = 5 
 #If parallelizing, idx will provide indexing for each set of trajectories
 @time begin
-IPR_vals = @. run_iterations(L, W_vals', gamma_vals, t_vals, dt,tmax, t_start, iterations)
+IPR_vals = @. run_iterations(L, W_vals', gamma_vals, g_vals, dt,tmax, t_start, iterations)
 end
 JLD.save("IPR_data.jld", "IPR", IPR_vals)
 
