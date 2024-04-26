@@ -45,14 +45,13 @@ function monitoring_evolution_IPR(L, gamma, dt, tmax, t_start, time_exponent)
     for t in 1:tmax
         # etas gives the Ito steps in the Wiener process
         etas = rand(Distributions.Normal(0, sqrt(dt*gamma)), L)
-        # D is the correlation matrix
-        D = U*U'
+        # Gives array of <n_i>
+        n_expected = sum(abs.(U) .^2, dims =(2))
         if t >= t_start
             U_4 = (abs.(U)) .^ 4
             IPR_avg += sum(U_4)
         end
-        # Gives array of <n_i>
-        n_expected = LinearAlgebra.diag(D)
+ 
         # Provides measurement matrix
         M_diag = etas + (gamma*dt) * (2 * n_expected .- 1)
         # Time evolution for U(t+dt) and QR decomposition 
